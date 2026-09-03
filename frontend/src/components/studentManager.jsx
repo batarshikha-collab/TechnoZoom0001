@@ -1,9 +1,16 @@
+
 import React, { useEffect, useState } from "react";
 
 function StudentManager() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // ======================================================
+  // API URL
+  // ======================================================
+
+  const API_URL = import.meta.env.VITE_API_URL;
 
   // ======================================================
   // GET ALL STUDENTS FROM BACKEND
@@ -14,8 +21,15 @@ function StudentManager() {
       setLoading(true);
       setError("");
 
+      if (!API_URL) {
+        setError(
+          "API URL is not configured. Please check the frontend .env file."
+        );
+        return;
+      }
+
       const response = await fetch(
-        "http://localhost:5000/api/students"
+        `${API_URL}/api/students`
       );
 
       const data = await response.json();
@@ -32,7 +46,7 @@ function StudentManager() {
       console.error("Fetch students error:", error);
 
       setError(
-        "Unable to connect to server. Please make sure backend is running."
+        "Unable to connect to server."
       );
     } finally {
       setLoading(false);
@@ -61,8 +75,15 @@ function StudentManager() {
     }
 
     try {
+      if (!API_URL) {
+        alert(
+          "API URL is not configured. Please check the frontend .env file."
+        );
+        return;
+      }
+
       const response = await fetch(
-        `http://localhost:5000/api/students/${id}`,
+        `${API_URL}/api/students/${id}`,
         {
           method: "DELETE",
         }
@@ -81,10 +102,13 @@ function StudentManager() {
 
       fetchStudents();
     } catch (error) {
-      console.error("Delete student error:", error);
+      console.error(
+        "Delete student error:",
+        error
+      );
 
       alert(
-        "Unable to connect to server. Please make sure backend is running."
+        "Unable to connect to server."
       );
     }
   };
@@ -195,24 +219,28 @@ function StudentManager() {
                           </td>
 
                           <td className="fw-semibold">
-                            {student.name}
+                            {student.name || "N/A"}
                           </td>
 
                           <td>
-                            {student.email}
+                            {student.email || "N/A"}
                           </td>
 
                           <td>
+
                             <span className="badge bg-primary">
-                              {student.registrationNo}
+                              {student.registrationNo || "N/A"}
                             </span>
+
                           </td>
 
                           <td>
                             {student.createdAt
                               ? new Date(
                                   student.createdAt
-                                ).toLocaleDateString()
+                                ).toLocaleDateString(
+                                  "en-IN"
+                                )
                               : "N/A"}
                           </td>
 

@@ -27,16 +27,14 @@ function Profile() {
   // ======================================================
 
   useEffect(() => {
-    const savedStudent =
-      localStorage.getItem("student");
+    const savedStudent = localStorage.getItem("student");
 
     if (!savedStudent) {
       navigate("/login");
       return;
     }
 
-    const loggedInStudent =
-      JSON.parse(savedStudent);
+    const loggedInStudent = JSON.parse(savedStudent);
 
     if (!loggedInStudent.id) {
       navigate("/login");
@@ -55,7 +53,7 @@ function Profile() {
       setLoading(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/students/${studentId}`
+        `${import.meta.env.VITE_API_URL}/api/students/${studentId}`
       );
 
       const data = await response.json();
@@ -81,10 +79,8 @@ function Profile() {
         year: profile.year || "",
         mobile: profile.mobile || "",
         college: profile.college || "",
-        profilePhoto:
-          profile.profilePhoto || "",
+        profilePhoto: profile.profilePhoto || "",
       });
-
     } catch (error) {
       console.log(
         "Profile fetch error:",
@@ -144,14 +140,12 @@ function Profile() {
       return;
     }
 
-    const reader =
-      new FileReader();
+    const reader = new FileReader();
 
     reader.onloadend = () => {
       setFormData((previous) => ({
         ...previous,
-        profilePhoto:
-          reader.result,
+        profilePhoto: reader.result,
       }));
     };
 
@@ -181,14 +175,13 @@ function Profile() {
         student.id || student._id;
 
       const response = await fetch(
-        `http://localhost:5000/api/students/${studentId}/photo`,
+        `${import.meta.env.VITE_API_URL}/api/students/${studentId}/photo`,
         {
           method: "DELETE",
         }
       );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok || !data.success) {
         alert(
@@ -209,9 +202,7 @@ function Profile() {
       // Update localStorage
       const savedStudent =
         JSON.parse(
-          localStorage.getItem(
-            "student"
-          )
+          localStorage.getItem("student")
         ) || {};
 
       localStorage.setItem(
@@ -228,7 +219,6 @@ function Profile() {
       alert(
         "Profile photo removed successfully!"
       );
-
     } catch (error) {
       console.log(
         "Remove photo error:",
@@ -260,7 +250,7 @@ function Profile() {
         student.id || student._id;
 
       const response = await fetch(
-        `http://localhost:5000/api/students/${studentId}`,
+        `${import.meta.env.VITE_API_URL}/api/students/${studentId}`,
         {
           method: "PUT",
 
@@ -269,14 +259,11 @@ function Profile() {
               "application/json",
           },
 
-          body: JSON.stringify(
-            formData
-          ),
+          body: JSON.stringify(formData),
         }
       );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok || !data.success) {
         alert(
@@ -315,9 +302,7 @@ function Profile() {
       // Update localStorage
       const savedStudent =
         JSON.parse(
-          localStorage.getItem(
-            "student"
-          )
+          localStorage.getItem("student")
         ) || {};
 
       localStorage.setItem(
@@ -336,7 +321,6 @@ function Profile() {
       alert(
         "Profile updated successfully!"
       );
-
     } catch (error) {
       console.log(
         "Update profile error:",
@@ -476,9 +460,7 @@ function Profile() {
               {formData.profilePhoto ? (
 
                 <img
-                  src={
-                    formData.profilePhoto
-                  }
+                  src={formData.profilePhoto}
                   alt="Profile"
                   className="rounded-circle border border-5 border-white shadow"
                   style={{
@@ -517,6 +499,7 @@ function Profile() {
               <p className="text-muted mb-1">
                 {student.course ||
                   "Computer Science Student"}
+
                 {student.branch
                   ? ` • ${student.branch}`
                   : ""}
@@ -556,9 +539,7 @@ function Profile() {
               type="file"
               ref={fileInputRef}
               accept="image/*"
-              onChange={
-                handlePhotoChange
-              }
+              onChange={handlePhotoChange}
               style={{
                 display: "none",
               }}
@@ -577,9 +558,7 @@ function Profile() {
 
               <button
                 className="btn btn-outline-danger btn-sm"
-                onClick={
-                  handleRemovePhoto
-                }
+                onClick={handleRemovePhoto}
               >
                 🗑️ Remove Photo
               </button>
@@ -604,9 +583,7 @@ function Profile() {
       {isEditing ? (
 
         <form
-          onSubmit={
-            handleSaveProfile
-          }
+          onSubmit={handleSaveProfile}
         >
 
           {/* ABOUT */}
@@ -628,16 +605,13 @@ function Profile() {
                 className="form-control"
                 rows="5"
                 placeholder="Write something about yourself, your interests, skills and career goals..."
-                value={
-                  formData.bio
-                }
-                onChange={
-                  handleChange
-                }
+                value={formData.bio}
+                onChange={handleChange}
               ></textarea>
 
               <div className="form-text">
-                Tell others about your interests, skills and goals.
+                Tell others about your interests,
+                skills and goals.
               </div>
 
             </div>
@@ -669,12 +643,8 @@ function Profile() {
                     type="text"
                     name="name"
                     className="form-control"
-                    value={
-                      formData.name
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.name}
+                    onChange={handleChange}
                     required
                   />
 
@@ -692,9 +662,7 @@ function Profile() {
                   <input
                     type="email"
                     className="form-control"
-                    value={
-                      student.email
-                    }
+                    value={student.email}
                     disabled
                   />
 
@@ -739,12 +707,8 @@ function Profile() {
                     name="course"
                     className="form-control"
                     placeholder="e.g. B.Tech"
-                    value={
-                      formData.course
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.course}
+                    onChange={handleChange}
                   />
 
                 </div>
@@ -763,12 +727,8 @@ function Profile() {
                     name="branch"
                     className="form-control"
                     placeholder="e.g. Computer Science & Engineering"
-                    value={
-                      formData.branch
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.branch}
+                    onChange={handleChange}
                   />
 
                 </div>
@@ -785,12 +745,8 @@ function Profile() {
                   <select
                     name="year"
                     className="form-select"
-                    value={
-                      formData.year
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.year}
+                    onChange={handleChange}
                   >
 
                     <option value="">
@@ -831,12 +787,8 @@ function Profile() {
                     name="mobile"
                     className="form-control"
                     placeholder="Enter mobile number"
-                    value={
-                      formData.mobile
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.mobile}
+                    onChange={handleChange}
                   />
 
                 </div>
@@ -855,12 +807,8 @@ function Profile() {
                     name="college"
                     className="form-control"
                     placeholder="Enter college name"
-                    value={
-                      formData.college
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.college}
+                    onChange={handleChange}
                   />
 
                 </div>
@@ -900,9 +848,7 @@ function Profile() {
             <button
               type="button"
               className="btn btn-outline-secondary px-4"
-              onClick={
-                handleCancelEdit
-              }
+              onClick={handleCancelEdit}
               disabled={saving}
             >
               Cancel
@@ -915,6 +861,7 @@ function Profile() {
       ) : (
 
         <>
+
           {/* ==================================================
               ABOUT SECTION
           ================================================== */}
@@ -932,8 +879,7 @@ function Profile() {
                 <p
                   className="text-muted mb-0"
                   style={{
-                    whiteSpace:
-                      "pre-wrap",
+                    whiteSpace: "pre-wrap",
                     lineHeight: "1.8",
                   }}
                 >
@@ -971,58 +917,42 @@ function Profile() {
 
                 <InfoItem
                   label="Full Name"
-                  value={
-                    student.name
-                  }
+                  value={student.name}
                 />
 
                 <InfoItem
                   label="Email"
-                  value={
-                    student.email
-                  }
+                  value={student.email}
                 />
 
                 <InfoItem
                   label="Registration No."
-                  value={
-                    student.registrationNo
-                  }
+                  value={student.registrationNo}
                 />
 
                 <InfoItem
                   label="Course"
-                  value={
-                    student.course
-                  }
+                  value={student.course}
                 />
 
                 <InfoItem
                   label="Branch"
-                  value={
-                    student.branch
-                  }
+                  value={student.branch}
                 />
 
                 <InfoItem
                   label="Year"
-                  value={
-                    student.year
-                  }
+                  value={student.year}
                 />
 
                 <InfoItem
                   label="Mobile"
-                  value={
-                    student.mobile
-                  }
+                  value={student.mobile}
                 />
 
                 <InfoItem
                   label="College"
-                  value={
-                    student.college
-                  }
+                  value={student.college}
                 />
 
               </div>

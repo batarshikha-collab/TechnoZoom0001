@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 function EditRegistration() {
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const [registration, setRegistration] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -76,7 +78,7 @@ function EditRegistration() {
       setLoading(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/registrations/${registration._id}`,
+        `${API_URL}/api/registrations/${registration._id}`,
         {
           method: "PUT",
 
@@ -91,16 +93,10 @@ function EditRegistration() {
       const data = await response.json();
 
       if (data.success) {
-        alert(
-          "Registration updated successfully!"
-        );
+        alert("Registration updated successfully!");
 
-        // Old edit data remove
-        localStorage.removeItem(
-          "editRegistration"
-        );
+        localStorage.removeItem("editRegistration");
 
-        // Dashboard par wapas
         navigate("/dashboard");
       } else {
         alert(
@@ -114,9 +110,7 @@ function EditRegistration() {
         error
       );
 
-      alert(
-        "Unable to connect to server."
-      );
+      alert("Unable to connect to server.");
     } finally {
       setLoading(false);
     }
@@ -164,7 +158,6 @@ function EditRegistration() {
 
       </div>
 
-
       {/* EVENT INFORMATION */}
 
       <div className="card shadow-sm border-0 mb-4">
@@ -202,7 +195,6 @@ function EditRegistration() {
 
       </div>
 
-
       {/* STUDENT INFORMATION */}
 
       <div className="card shadow-sm border-0 mb-4">
@@ -230,7 +222,6 @@ function EditRegistration() {
 
             </div>
 
-
             <div className="col-md-6 mb-3">
 
               <label className="form-label fw-semibold">
@@ -241,14 +232,12 @@ function EditRegistration() {
                 type="text"
                 className="form-control"
                 value={
-                  registration.registrationNo ||
-                  ""
+                  registration.registrationNo || ""
                 }
                 disabled
               />
 
             </div>
-
 
             <div className="col-md-6 mb-3">
 
@@ -264,7 +253,6 @@ function EditRegistration() {
               />
 
             </div>
-
 
             <div className="col-md-6 mb-3">
 
@@ -288,7 +276,6 @@ function EditRegistration() {
         </div>
 
       </div>
-
 
       {/* EDITABLE DETAILS */}
 
@@ -324,7 +311,6 @@ function EditRegistration() {
 
               </div>
 
-
               {/* BRANCH */}
 
               <div className="col-md-6 mb-3">
@@ -344,7 +330,6 @@ function EditRegistration() {
                 />
 
               </div>
-
 
               {/* YEAR */}
 
@@ -385,7 +370,6 @@ function EditRegistration() {
                 </select>
 
               </div>
-
 
               {/* SEMESTER */}
 
@@ -443,7 +427,6 @@ function EditRegistration() {
 
               </div>
 
-
               {/* MOBILE */}
 
               <div className="col-md-6 mb-3">
@@ -463,7 +446,6 @@ function EditRegistration() {
                 />
 
               </div>
-
 
               {/* COLLEGE */}
 
@@ -486,7 +468,6 @@ function EditRegistration() {
               </div>
 
             </div>
-
 
             {/* BUTTONS */}
 
@@ -527,5 +508,3 @@ function EditRegistration() {
 }
 
 export default EditRegistration;
-
-

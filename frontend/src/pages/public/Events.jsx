@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -14,7 +15,7 @@ function Events() {
       setError("");
 
       const response = await fetch(
-        "http://localhost:5000/api/events"
+        `${import.meta.env.VITE_API_URL}/api/events`
       );
 
       const data = await response.json();
@@ -112,7 +113,6 @@ function Events() {
 
   return (
     <div className="bg-light min-vh-100">
-
       <div className="container py-5">
 
         {/* Heading */}
@@ -225,7 +225,6 @@ function Events() {
         )}
 
       </div>
-
     </div>
   );
 }

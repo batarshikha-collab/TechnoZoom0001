@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 
 function Registrations() {
@@ -6,13 +5,27 @@ function Registrations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  // ======================================================
+  // FETCH ALL REGISTRATIONS
+  // ======================================================
+
   const fetchRegistrations = async () => {
     try {
       setLoading(true);
       setError("");
 
+      if (!API_URL) {
+        setError(
+          "API URL is not configured. Please check the frontend .env file."
+        );
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch(
-        "http://localhost:5000/api/registrations"
+        `${API_URL}/api/registrations`
       );
 
       const data = await response.json();
@@ -21,8 +34,9 @@ function Registrations() {
 
       if (!response.ok || !data.success) {
         setError(
-          data.message || "Failed to load registrations"
+          data.message || "Failed to load registrations."
         );
+        setLoading(false);
         return;
       }
 
@@ -38,14 +52,24 @@ function Registrations() {
     }
   };
 
+  // ======================================================
+  // LOAD REGISTRATIONS
+  // ======================================================
+
   useEffect(() => {
     fetchRegistrations();
   }, []);
 
+  // ======================================================
+  // PAGE
+  // ======================================================
+
   return (
     <div className="container-fluid py-5">
 
-      {/* HEADER */}
+      {/* ==================================================
+          HEADER
+      ================================================== */}
 
       <div className="d-flex justify-content-between align-items-center mb-4">
 
@@ -55,20 +79,34 @@ function Registrations() {
           </h2>
 
           <p className="text-muted mb-0">
-            Complete details of students registered for events
+            All students registered for events
           </p>
         </div>
 
         <button
           className="btn btn-primary"
           onClick={fetchRegistrations}
+          disabled={loading}
         >
-          Refresh
+          {loading ? "Loading..." : "Refresh"}
         </button>
 
       </div>
 
-      {/* LOADING */}
+      {/* ==================================================
+          TOTAL REGISTRATIONS
+      ================================================== */}
+
+      {!loading && !error && (
+        <div className="alert alert-info mb-4">
+          <strong>Total Registrations:</strong>{" "}
+          {registrations.length}
+        </div>
+      )}
+
+      {/* ==================================================
+          LOADING
+      ================================================== */}
 
       {loading && (
         <div className="text-center py-5">
@@ -78,14 +116,16 @@ function Registrations() {
             role="status"
           ></div>
 
-          <p className="mt-3">
+          <p className="mt-3 text-muted">
             Loading registrations...
           </p>
 
         </div>
       )}
 
-      {/* ERROR */}
+      {/* ==================================================
+          ERROR
+      ================================================== */}
 
       {!loading && error && (
         <div className="alert alert-danger">
@@ -93,326 +133,300 @@ function Registrations() {
         </div>
       )}
 
-      {/* EMPTY */}
+      {/* ==================================================
+          EMPTY
+      ================================================== */}
 
       {!loading &&
         !error &&
         registrations.length === 0 && (
 
-          <div className="alert alert-info">
+          <div className="alert alert-warning">
             No event registrations found.
           </div>
+
         )}
 
-      {/* REGISTRATIONS */}
+      {/* ==================================================
+          REGISTRATION TABLE
+      ================================================== */}
 
       {!loading &&
         !error &&
         registrations.length > 0 && (
 
-          <div>
+          <div className="card shadow-sm border-0">
 
-            {registrations.map((registration, index) => {
+            <div className="card-body p-0">
 
-              const student = registration.studentId || {};
-              const event = registration.eventId || {};
+              {/* Horizontal scrolling */}
+              <div
+                className="table-responsive"
+                style={{
+                  maxHeight: "650px",
+                  overflow: "auto",
+                }}
+              >
 
-              return (
+                <table className="table table-bordered table-hover align-middle mb-0">
 
-                <div
-                  className="card shadow-sm border-0 mb-4"
-                  key={registration._id || index}
-                >
+                  {/* ==================================================
+                      TABLE HEADER
+                  ================================================== */}
 
-                  <div className="card-body p-4">
+                  <thead className="table-dark sticky-top">
 
-                    {/* TOP HEADER */}
+                    <tr>
 
-                    <div className="d-flex justify-content-between align-items-center mb-4">
+                      <th className="text-center">
+                        #
+                      </th>
 
-                      <div>
+                      <th>
+                        Student Name
+                      </th>
 
-                        <h4 className="fw-bold mb-2">
-                          Registration #{index + 1}
-                        </h4>
+                      <th>
+                        Registration No.
+                      </th>
 
-                        <span className="badge bg-primary">
-                          {registration.registrationNo || "-"}
-                        </span>
+                      <th>
+                        Roll No.
+                      </th>
 
-                      </div>
+                      <th>
+                        Course
+                      </th>
 
-                      <div className="text-end">
+                      <th>
+                        Branch
+                      </th>
 
-                        <span
-                          className={`badge ${
-                            registration.status === "Cancelled"
-                              ? "bg-danger"
-                              : "bg-success"
-                          }`}
-                        >
-                          {registration.status || "Registered"}
-                        </span>
+                      <th>
+                        Year
+                      </th>
 
-                        <div className="small text-muted mt-2">
-                          {registration.createdAt
-                            ? new Date(
-                                registration.createdAt
-                              ).toLocaleString()
-                            : "-"}
-                        </div>
+                      <th>
+                        Semester
+                      </th>
 
-                      </div>
+                      <th>
+                        Mobile
+                      </th>
 
-                    </div>
+                      <th>
+                        College
+                      </th>
 
+                      <th>
+                        Email
+                      </th>
 
-                    {/* EVENT DETAILS */}
+                      <th>
+                        Event
+                      </th>
 
-                    <div className="card bg-light border-0 mb-4">
+                      <th>
+                        Event Date
+                      </th>
 
-                      <div className="card-body">
+                      <th>
+                        Venue
+                      </th>
 
-                        <h5 className="fw-bold mb-3">
-                          Event Details
-                        </h5>
+                      <th>
+                        Category
+                      </th>
 
-                        <div className="row">
+                      <th>
+                        Status
+                      </th>
 
-                          <div className="col-md-3 mb-2">
-                            <strong>Event:</strong>
-                            <br />
-                            {event.title || "-"}
-                          </div>
+                      <th>
+                        Registered On
+                      </th>
 
-                          <div className="col-md-3 mb-2">
-                            <strong>Date:</strong>
-                            <br />
-                            {event.date || "-"}
-                          </div>
+                    </tr>
 
-                          <div className="col-md-3 mb-2">
-                            <strong>Venue:</strong>
-                            <br />
-                            {event.venue || "-"}
-                          </div>
+                  </thead>
 
-                          <div className="col-md-3 mb-2">
-                            <strong>Category:</strong>
-                            <br />
-                            {event.category || "-"}
-                          </div>
+                  {/* ==================================================
+                      TABLE BODY
+                  ================================================== */}
 
-                        </div>
+                  <tbody>
 
-                      </div>
+                    {registrations.map(
+                      (registration, index) => {
 
-                    </div>
+                        const student =
+                          registration.studentId || {};
 
+                        const event =
+                          registration.eventId || {};
 
-                    {/* STUDENT DETAILS */}
+                        return (
+                          <tr
+                            key={
+                              registration._id ||
+                              index
+                            }
+                          >
 
-                    <h5 className="fw-bold border-bottom pb-2 mb-4">
-                      Student Registration Details
-                    </h5>
+                            {/* NUMBER */}
 
-                    <div className="row">
+                            <td className="text-center fw-bold">
+                              {index + 1}
+                            </td>
 
-                      {/* NAME */}
+                            {/* STUDENT NAME */}
 
-                      <div className="col-md-4 mb-4">
+                            <td className="fw-semibold">
+                              {registration.name ||
+                                student.name ||
+                                "-"}
+                            </td>
 
-                        <small className="text-muted">
-                          Full Name
-                        </small>
+                            {/* REGISTRATION NUMBER */}
 
-                        <div className="fw-semibold">
-                          {registration.name ||
-                            student.name ||
-                            "-"}
-                        </div>
+                            <td>
+                              <span className="badge bg-primary">
+                                {registration.registrationNo ||
+                                  student.registrationNo ||
+                                  "-"}
+                              </span>
+                            </td>
 
-                      </div>
+                            {/* ROLL NUMBER */}
 
+                            <td>
+                              {registration.rollNo ||
+                                "-"}
+                            </td>
 
-                      {/* REGISTRATION NUMBER */}
+                            {/* COURSE */}
 
-                      <div className="col-md-4 mb-4">
+                            <td>
+                              {registration.course ||
+                                "-"}
+                            </td>
 
-                        <small className="text-muted">
-                          Registration No.
-                        </small>
+                            {/* BRANCH */}
 
-                        <div className="fw-semibold text-primary">
-                          {registration.registrationNo ||
-                            student.registrationNo ||
-                            "-"}
-                        </div>
+                            <td>
+                              {registration.branch ||
+                                "-"}
+                            </td>
 
-                      </div>
+                            {/* YEAR */}
 
+                            <td>
+                              {registration.year ||
+                                "-"}
+                            </td>
 
-                      {/* ROLL NUMBER */}
+                            {/* SEMESTER */}
 
-                      <div className="col-md-4 mb-4">
+                            <td>
+                              {registration.semester ||
+                                "-"}
+                            </td>
 
-                        <small className="text-muted">
-                          Roll No.
-                        </small>
+                            {/* MOBILE */}
 
-                        <div className="fw-semibold">
-                          {registration.rollNo || "-"}
-                        </div>
+                            <td>
+                              {registration.mobile ||
+                                "-"}
+                            </td>
 
-                      </div>
+                            {/* COLLEGE */}
 
+                            <td>
+                              {registration.college ||
+                                "-"}
+                            </td>
 
-                      {/* COURSE */}
+                            {/* EMAIL */}
 
-                      <div className="col-md-4 mb-4">
+                            <td>
+                              {registration.email ||
+                                student.email ||
+                                "-"}
+                            </td>
 
-                        <small className="text-muted">
-                          Course
-                        </small>
+                            {/* EVENT */}
 
-                        <div className="fw-semibold">
-                          {registration.course || "-"}
-                        </div>
+                            <td className="fw-semibold">
+                              {event.title ||
+                                "-"}
+                            </td>
 
-                      </div>
+                            {/* EVENT DATE */}
 
+                            <td>
+                              {event.date ||
+                                "-"}
+                            </td>
 
-                      {/* BRANCH */}
+                            {/* VENUE */}
 
-                      <div className="col-md-4 mb-4">
+                            <td>
+                              {event.venue ||
+                                "-"}
+                            </td>
 
-                        <small className="text-muted">
-                          Branch
-                        </small>
+                            {/* CATEGORY */}
 
-                        <div className="fw-semibold">
-                          {registration.branch || "-"}
-                        </div>
+                            <td>
+                              {event.category ||
+                                "-"}
+                            </td>
 
-                      </div>
+                            {/* STATUS */}
 
+                            <td>
 
-                      {/* YEAR */}
+                              <span
+                                className={`badge ${
+                                  registration.status ===
+                                  "Cancelled"
+                                    ? "bg-danger"
+                                    : "bg-success"
+                                }`}
+                              >
+                                {registration.status ||
+                                  "Registered"}
+                              </span>
 
-                      <div className="col-md-4 mb-4">
+                            </td>
 
-                        <small className="text-muted">
-                          Year
-                        </small>
+                            {/* REGISTERED DATE */}
 
-                        <div className="fw-semibold">
-                          {registration.year || "-"}
-                        </div>
+                            <td>
+                              {registration.createdAt
+                                ? new Date(
+                                    registration.createdAt
+                                  ).toLocaleString(
+                                    "en-IN"
+                                  )
+                                : "-"}
+                            </td>
 
-                      </div>
+                          </tr>
+                        );
+                      }
+                    )}
 
+                  </tbody>
 
-                      {/* SEMESTER */}
+                </table>
 
-                      <div className="col-md-4 mb-4">
+              </div>
 
-                        <small className="text-muted">
-                          Semester
-                        </small>
-
-                        <div className="fw-semibold">
-                          {registration.semester || "-"}
-                        </div>
-
-                      </div>
-
-
-                      {/* MOBILE */}
-
-                      <div className="col-md-4 mb-4">
-
-                        <small className="text-muted">
-                          Mobile
-                        </small>
-
-                        <div className="fw-semibold">
-                          {registration.mobile || "-"}
-                        </div>
-
-                      </div>
-
-
-                      {/* COLLEGE */}
-
-                      <div className="col-md-4 mb-4">
-
-                        <small className="text-muted">
-                          College
-                        </small>
-
-                        <div className="fw-semibold">
-                          {registration.college || "-"}
-                        </div>
-
-                      </div>
-
-
-                      {/* EMAIL */}
-
-                      <div className="col-md-6 mb-4">
-
-                        <small className="text-muted">
-                          Email
-                        </small>
-
-                        <div className="fw-semibold">
-                          {registration.email ||
-                            student.email ||
-                            "-"}
-                        </div>
-
-                      </div>
-
-
-                      {/* STUDENT ID */}
-
-                      <div className="col-md-6 mb-4">
-
-                        <small className="text-muted">
-                          Student ID
-                        </small>
-
-                        <div className="fw-semibold">
-                          {student._id || "-"}
-                        </div>
-
-                      </div>
-
-                    </div>
-
-
-                    {/* REGISTRATION ID */}
-
-                    <div className="alert alert-light border mb-0">
-
-                      <strong>
-                        Registration ID:
-                      </strong>
-
-                      <span className="ms-2 text-primary">
-                        {registration._id || "-"}
-                      </span>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              );
-            })}
+            </div>
 
           </div>
+
         )}
 
     </div>

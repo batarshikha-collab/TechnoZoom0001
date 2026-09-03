@@ -1,12 +1,12 @@
-import Navbar from "../../components/Navbar";
+
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+  const navigate = useNavigate();
+
   return (
     <div>
-
-      {/* NAVBAR */}
-      {/* <Navbar /> */}
-
 
       {/* ================= HERO SECTION ================= */}
 
@@ -17,6 +17,7 @@ function Home() {
           <div className="row align-items-center">
 
             {/* LEFT SIDE */}
+
             <div className="col-lg-6 col-12">
 
               <p className="text-primary fw-bold">
@@ -36,14 +37,17 @@ function Home() {
                 workshops and gaming events.
               </p>
 
-              <button className="btn btn-primary btn-lg mt-3">
+              <button
+                className="btn btn-primary btn-lg mt-3"
+                onClick={() => navigate("/events")}
+              >
                 Explore Events
               </button>
 
             </div>
 
-
             {/* RIGHT SIDE */}
+
             <div className="col-lg-6 col-12 mt-4 mt-lg-0">
 
               <img
@@ -86,7 +90,8 @@ function Home() {
 
           <div className="row g-4">
 
-            {/* HACKATHON */}
+            {/* ================= HACKATHON ================= */}
+
             <div className="col-lg-4 col-md-6 col-12">
 
               <div className="card h-100 shadow-sm">
@@ -112,7 +117,10 @@ function Home() {
                     with talented students.
                   </p>
 
-                  <button className="btn btn-outline-primary">
+                  <button
+                    className="btn btn-outline-primary"
+                    onClick={() => navigate("/events")}
+                  >
                     View Event →
                   </button>
 
@@ -123,7 +131,8 @@ function Home() {
             </div>
 
 
-            {/* LUDO */}
+            {/* ================= LUDO ================= */}
+
             <div className="col-lg-4 col-md-6 col-12">
 
               <div className="card h-100 shadow-sm">
@@ -149,7 +158,10 @@ function Home() {
                     for the championship.
                   </p>
 
-                  <button className="btn btn-outline-primary">
+                  <button
+                    className="btn btn-outline-primary"
+                    onClick={() => navigate("/events")}
+                  >
                     View Event →
                   </button>
 
@@ -160,7 +172,8 @@ function Home() {
             </div>
 
 
-            {/* QUIZ */}
+            {/* ================= QUIZ ================= */}
+
             <div className="col-lg-4 col-md-6 col-12">
 
               <div className="card h-100 shadow-sm">
@@ -186,7 +199,10 @@ function Home() {
                     prove your skills.
                   </p>
 
-                  <button className="btn btn-outline-primary">
+                  <button
+                    className="btn btn-outline-primary"
+                    onClick={() => navigate("/events")}
+                  >
                     View Event →
                   </button>
 
@@ -224,6 +240,8 @@ function Home() {
 
           <div className="row g-4">
 
+            {/* DISCOVER */}
+
             <div className="col-lg-4 col-md-6 col-12">
 
               <div className="text-center p-4">
@@ -243,6 +261,8 @@ function Home() {
             </div>
 
 
+            {/* COMPETE */}
+
             <div className="col-lg-4 col-md-6 col-12">
 
               <div className="text-center p-4">
@@ -261,6 +281,8 @@ function Home() {
 
             </div>
 
+
+            {/* CONNECT */}
 
             <div className="col-lg-4 col-md-6 col-12">
 
@@ -301,7 +323,10 @@ function Home() {
             Join TechnoZoom and discover your next opportunity.
           </p>
 
-          <button className="btn btn-light btn-lg">
+          <button
+            className="btn btn-light btn-lg"
+            onClick={() => navigate("/events")}
+          >
             Explore Events →
           </button>
 
@@ -312,7 +337,7 @@ function Home() {
 
       {/* ================= FOOTER ================= */}
 
-      {/* <footer className="bg-dark text-white py-4">
+      <footer className="bg-dark text-white py-4">
 
         <div className="container">
 
@@ -330,6 +355,7 @@ function Home() {
 
             </div>
 
+
             <div className="col-md-6 text-md-end">
 
               <p className="text-secondary">
@@ -341,8 +367,9 @@ function Home() {
           </div>
 
         </div>
-{/* 
-      </footer> */} 
+
+      </footer>
+
     </div>
   );
 }

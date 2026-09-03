@@ -6,6 +6,12 @@ function Students() {
   const [error, setError] = useState("");
 
   // ==========================================
+  // API URL
+  // ==========================================
+
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  // ==========================================
   // FETCH STUDENTS
   // ==========================================
 
@@ -14,8 +20,16 @@ function Students() {
       setLoading(true);
       setError("");
 
+      // Check API URL
+      if (!API_URL) {
+        setError(
+          "API URL is not configured. Please check the frontend .env file."
+        );
+        return;
+      }
+
       const response = await fetch(
-        "http://localhost:5000/api/students"
+        `${API_URL}/api/students`
       );
 
       const data = await response.json();
@@ -30,7 +44,10 @@ function Students() {
       setStudents(data.students || []);
 
     } catch (error) {
-      console.error("Fetch students error:", error);
+      console.error(
+        "Fetch students error:",
+        error
+      );
 
       setError(
         "Unable to connect to server. Please make sure backend is running."
@@ -55,11 +72,14 @@ function Students() {
   const formatDate = (date) => {
     if (!date) return "N/A";
 
-    return new Date(date).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
+    return new Date(date).toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }
+    );
   };
 
   // ==========================================
@@ -120,6 +140,7 @@ function Students() {
         <div className="d-flex justify-content-between align-items-center mb-4">
 
           <div>
+
             <h2 className="fw-bold mb-1">
               Registered Students
             </h2>
@@ -127,6 +148,7 @@ function Students() {
             <p className="text-muted mb-0">
               Students who have created an account on TechnoZoom
             </p>
+
           </div>
 
           <button
@@ -193,37 +215,46 @@ function Students() {
 
                 <tbody>
 
-                  {students.map((student, index) => (
+                  {students.map(
+                    (student, index) => (
 
-                    <tr key={student._id}>
+                      <tr
+                        key={
+                          student._id || index
+                        }
+                      >
 
-                      <td>
-                        {index + 1}
-                      </td>
+                        <td>
+                          {index + 1}
+                        </td>
 
-                      <td className="fw-semibold">
-                        {student.name || "N/A"}
-                      </td>
+                        <td className="fw-semibold">
+                          {student.name || "N/A"}
+                        </td>
 
-                      <td>
-                        {student.email || "N/A"}
-                      </td>
+                        <td>
+                          {student.email || "N/A"}
+                        </td>
 
-                      <td>
+                        <td>
 
-                        <span className="badge bg-primary">
-                          {student.registrationNo || "N/A"}
-                        </span>
+                          <span className="badge bg-primary">
+                            {student.registrationNo ||
+                              "N/A"}
+                          </span>
 
-                      </td>
+                        </td>
 
-                      <td>
-                        {formatDate(student.createdAt)}
-                      </td>
+                        <td>
+                          {formatDate(
+                            student.createdAt
+                          )}
+                        </td>
 
-                    </tr>
+                      </tr>
 
-                  ))}
+                    )
+                  )}
 
                 </tbody>
 

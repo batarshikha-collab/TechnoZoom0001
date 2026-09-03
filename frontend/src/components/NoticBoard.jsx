@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 
 function NoticeBoard() {
@@ -11,7 +12,7 @@ function NoticeBoard() {
       setError("");
 
       const response = await fetch(
-        "http://localhost:5000/api/notices"
+        `${import.meta.env.VITE_API_URL}/api/notices`
       );
 
       const data = await response.json();

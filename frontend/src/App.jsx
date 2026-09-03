@@ -51,8 +51,11 @@ import AdminProtectedRoute from "./components/AdminRoute";
 
 import EventManager from "./components/EventManager";
 import StudentManager from "./components/studentManager";
-import RegisteredStudents from "./components/RegisterStudent";
 
+// IMPORTANT:
+// Admin ke View Registrations ke liye
+// Registrations.jsx import karna hai
+import Registrations from "./components/Registrations";
 
 import EditRegistration from "./components/EditRegisteration";
 
@@ -217,11 +220,16 @@ function App() {
             ADMIN - EVENT REGISTRATIONS
         ================================================== */}
 
+        {/* IMPORTANT:
+            Yahan Registrations.jsx open hoga.
+            RegisterStudent.jsx nahi.
+        */}
+
         <Route
           path="/admin/registrations"
           element={
             <AdminProtectedRoute>
-              <RegisteredStudents />
+              <Registrations />
             </AdminProtectedRoute>
           }
         />
@@ -239,18 +247,18 @@ function App() {
           }
         />
 
+        {/* ==================================================
+            EDIT REGISTRATION
+        ================================================== */}
 
-
-          <Route
+        <Route
           path="/edit-registration"
-         element={
-         <ProtectedRoute>
-        <EditRegistration />
-        </ProtectedRoute>
-               }
+          element={
+            <ProtectedRoute>
+              <EditRegistration />
+            </ProtectedRoute>
+          }
         />
-
-
 
       </Routes>
 

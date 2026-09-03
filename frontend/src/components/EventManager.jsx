@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 function EventManager() {
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const [events, setEvents] = useState([]);
 
   const [title, setTitle] = useState("");
@@ -13,21 +15,23 @@ function EventManager() {
   const [loading, setLoading] = useState(false);
 
   // =====================================================
-  // FETCH EVENTS FROM MONGODB
+  // FETCH EVENTS
   // =====================================================
 
   const fetchEvents = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/events"
+        `${API_URL}/api/events`
       );
 
       const data = await response.json();
 
       if (data.success) {
-        setEvents(data.events);
+        setEvents(data.events || []);
       } else {
-        alert(data.message || "Unable to fetch events");
+        alert(
+          data.message || "Unable to fetch events"
+        );
       }
     } catch (error) {
       console.log("Fetch Events Error:", error);
@@ -66,7 +70,7 @@ function EventManager() {
       // UPDATE
       if (editId) {
         response = await fetch(
-          `http://localhost:5000/api/events/${editId}`,
+          `${API_URL}/api/events/${editId}`,
           {
             method: "PUT",
             headers: {
@@ -80,7 +84,7 @@ function EventManager() {
       // ADD
       else {
         response = await fetch(
-          "http://localhost:5000/api/events",
+          `${API_URL}/api/events`,
           {
             method: "POST",
             headers: {
@@ -115,7 +119,7 @@ function EventManager() {
       setCategory("");
       setEditId(null);
 
-      // MongoDB se fresh events
+      // Refresh events
       fetchEvents();
 
     } catch (error) {
@@ -133,11 +137,11 @@ function EventManager() {
   const handleEdit = (event) => {
     setEditId(event._id);
 
-    setTitle(event.title);
-    setDate(event.date);
-    setVenue(event.venue);
-    setDescription(event.description);
-    setCategory(event.category);
+    setTitle(event.title || "");
+    setDate(event.date || "");
+    setVenue(event.venue || "");
+    setDescription(event.description || "");
+    setCategory(event.category || "");
 
     window.scrollTo({
       top: 0,
@@ -160,7 +164,7 @@ function EventManager() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/events/${id}`,
+        `${API_URL}/api/events/${id}`,
         {
           method: "DELETE",
         }
@@ -170,7 +174,6 @@ function EventManager() {
 
       if (data.success) {
         alert("Event deleted successfully!");
-
         fetchEvents();
       } else {
         alert(
@@ -180,7 +183,10 @@ function EventManager() {
       }
 
     } catch (error) {
-      console.log("Delete Event Error:", error);
+      console.log(
+        "Delete Event Error:",
+        error
+      );
 
       alert("Unable to connect to server.");
     }
@@ -223,7 +229,6 @@ function EventManager() {
 
       </div>
 
-
       {/* EVENT FORM */}
 
       <div className="card shadow-sm border-0 p-4 mb-5">
@@ -251,7 +256,6 @@ function EventManager() {
 
           </div>
 
-
           {/* DATE */}
 
           <div className="mb-3">
@@ -271,7 +275,6 @@ function EventManager() {
             />
 
           </div>
-
 
           {/* VENUE */}
 
@@ -293,7 +296,6 @@ function EventManager() {
             />
 
           </div>
-
 
           {/* CATEGORY */}
 
@@ -344,7 +346,6 @@ function EventManager() {
 
           </div>
 
-
           {/* DESCRIPTION */}
 
           <div className="mb-4">
@@ -366,7 +367,6 @@ function EventManager() {
 
           </div>
 
-
           {/* BUTTON */}
 
           <button
@@ -383,7 +383,6 @@ function EventManager() {
 
           </button>
 
-
           {/* CANCEL EDIT */}
 
           {editId && (
@@ -399,7 +398,6 @@ function EventManager() {
         </form>
 
       </div>
-
 
       {/* EVENT LIST */}
 
@@ -425,7 +423,6 @@ function EventManager() {
         </button>
 
       </div>
-
 
       {events.length === 0 ? (
 

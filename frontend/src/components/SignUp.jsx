@@ -4,6 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 function SignUp() {
   const navigate = useNavigate();
 
+  // ======================================================
+  // API URL
+  // ======================================================
+
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,10 +18,22 @@ function SignUp() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ======================================================
+  // HANDLE SIGNUP
+  // ======================================================
+
   const handleSignup = async (e) => {
     e.preventDefault();
 
     setError("");
+
+    // Check API URL
+    if (!API_URL) {
+      setError(
+        "API URL is not configured. Please check the frontend .env file."
+      );
+      return;
+    }
 
     // Password check
     if (password !== confirmPassword) {
@@ -26,55 +44,91 @@ function SignUp() {
     try {
       setLoading(true);
 
-      // Send data to backend
-      const response = await fetch("http://localhost:5000/api/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-        }),
-      });
+      // ==================================================
+      // SEND DATA TO BACKEND
+      // ==================================================
+
+      const response = await fetch(
+        `${API_URL}/api/signup`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+          }),
+        }
+      );
 
       const data = await response.json();
 
-      // Backend error
-      if (!response.ok) {
-        setError(data.message || "Signup failed.");
+      console.log("SIGNUP RESPONSE:", data);
+
+      // ==================================================
+      // BACKEND ERROR
+      // ==================================================
+
+      if (!response.ok || !data.success) {
+        setError(
+          data.message || "Signup failed."
+        );
         return;
       }
 
-      // Success
+      // ==================================================
+      // SUCCESS
+      // ==================================================
+
       alert(
-        `Account created successfully!\nYour Registration No. is: ${data.student.registrationNo}`
+        `Account created successfully!\nYour Registration No. is: ${
+          data.student?.registrationNo || "N/A"
+        }`
       );
 
       // Go to login
       navigate("/login");
+
     } catch (error) {
-      console.log(error);
+      console.error(
+        "Signup error:",
+        error
+      );
 
       setError(
         "Unable to connect to server. Please make sure backend is running."
       );
+
     } finally {
       setLoading(false);
     }
   };
 
+  // ======================================================
+  // PAGE
+  // ======================================================
+
   return (
     <div className="bg-light min-vh-100">
+
       <div className="container py-5">
+
         <div className="row justify-content-center">
+
           <div className="col-md-7 col-lg-5">
+
             <div className="card border-0 shadow-sm">
+
               <div className="card-body p-4 p-md-5">
 
-                {/* Heading */}
+                {/* HEADING */}
+
                 <div className="text-center mb-4">
+
                   <h2 className="fw-bold">
                     Create Student Account
                   </h2>
@@ -82,20 +136,25 @@ function SignUp() {
                   <p className="text-muted">
                     Join TechnoZoom today
                   </p>
+
                 </div>
 
-                {/* Error */}
+                {/* ERROR */}
+
                 {error && (
                   <div className="alert alert-danger">
                     {error}
                   </div>
                 )}
 
-                {/* Form */}
+                {/* FORM */}
+
                 <form onSubmit={handleSignup}>
 
-                  {/* Name */}
+                  {/* NAME */}
+
                   <div className="mb-3">
+
                     <label className="form-label fw-semibold">
                       Full Name
                     </label>
@@ -105,13 +164,18 @@ function SignUp() {
                       className="form-control"
                       placeholder="Enter your full name"
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e) =>
+                        setName(e.target.value)
+                      }
                       required
                     />
+
                   </div>
 
-                  {/* Email */}
+                  {/* EMAIL */}
+
                   <div className="mb-3">
+
                     <label className="form-label fw-semibold">
                       Email
                     </label>
@@ -121,13 +185,18 @@ function SignUp() {
                       className="form-control"
                       placeholder="Enter your email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) =>
+                        setEmail(e.target.value)
+                      }
                       required
                     />
+
                   </div>
 
-                  {/* Password */}
+                  {/* PASSWORD */}
+
                   <div className="mb-3">
+
                     <label className="form-label fw-semibold">
                       Password
                     </label>
@@ -137,14 +206,19 @@ function SignUp() {
                       className="form-control"
                       placeholder="Create a password"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) =>
+                        setPassword(e.target.value)
+                      }
                       required
                       minLength="6"
                     />
+
                   </div>
 
-                  {/* Confirm Password */}
+                  {/* CONFIRM PASSWORD */}
+
                   <div className="mb-4">
+
                     <label className="form-label fw-semibold">
                       Confirm Password
                     </label>
@@ -155,25 +229,35 @@ function SignUp() {
                       placeholder="Confirm your password"
                       value={confirmPassword}
                       onChange={(e) =>
-                        setConfirmPassword(e.target.value)
+                        setConfirmPassword(
+                          e.target.value
+                        )
                       }
                       required
                     />
+
                   </div>
 
-                  {/* Signup Button */}
+                  {/* SIGNUP BUTTON */}
+
                   <button
                     type="submit"
                     className="btn btn-primary w-100"
                     disabled={loading}
                   >
-                    {loading ? "Creating Account..." : "Create Account"}
+
+                    {loading
+                      ? "Creating Account..."
+                      : "Create Account"}
+
                   </button>
 
                 </form>
 
-                {/* Login */}
+                {/* LOGIN */}
+
                 <div className="text-center mt-4">
+
                   <span className="text-muted">
                     Already have an account?
                   </span>{" "}
@@ -184,13 +268,19 @@ function SignUp() {
                   >
                     Login
                   </Link>
+
                 </div>
 
               </div>
+
             </div>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
   );
 }

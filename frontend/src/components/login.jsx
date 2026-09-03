@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -20,7 +21,7 @@ function Login() {
 
       // Backend ko login request
       const response = await fetch(
-        "http://localhost:5000/api/login",
+        `${import.meta.env.VITE_API_URL}/api/login`,
         {
           method: "POST",
           headers: {
@@ -85,8 +86,6 @@ function Login() {
 
               <div className="card-body p-4 p-md-5">
 
-                {/* Heading */}
-
                 <div className="text-center mb-4">
 
                   <h2 className="fw-bold">
@@ -99,19 +98,13 @@ function Login() {
 
                 </div>
 
-                {/* Error */}
-
                 {error && (
                   <div className="alert alert-danger">
                     {error}
                   </div>
                 )}
 
-                {/* Form */}
-
                 <form onSubmit={handleLogin}>
-
-                  {/* Email */}
 
                   <div className="mb-3">
 
@@ -132,8 +125,6 @@ function Login() {
 
                   </div>
 
-                  {/* Password */}
-
                   <div className="mb-4">
 
                     <label className="form-label fw-semibold">
@@ -153,8 +144,6 @@ function Login() {
 
                   </div>
 
-                  {/* Login Button */}
-
                   <button
                     type="submit"
                     className="btn btn-primary w-100"
@@ -166,8 +155,6 @@ function Login() {
                   </button>
 
                 </form>
-
-                {/* Signup */}
 
                 <div className="text-center mt-4">
 

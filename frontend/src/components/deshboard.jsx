@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +11,8 @@ function Dashboard() {
 
   const [loading, setLoading] = useState(true);
   const [noticeLoading, setNoticeLoading] = useState(true);
+
+  const API_URL = import.meta.env.VITE_API_URL;
 
   // ======================================================
   // LOAD STUDENT
@@ -27,10 +30,7 @@ function Dashboard() {
 
     setStudent(loggedInStudent);
 
-    // MongoDB se registrations
     fetchRegistrations(loggedInStudent.id);
-
-    // MongoDB se notices
     fetchNotices();
   }, [navigate]);
 
@@ -43,7 +43,7 @@ function Dashboard() {
       setLoading(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/registrations/student/${studentId}`
+        `${API_URL}/api/registrations/student/${studentId}`
       );
 
       const data = await response.json();
@@ -74,7 +74,7 @@ function Dashboard() {
       setNoticeLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/notices"
+        `${API_URL}/api/notices`
       );
 
       const data = await response.json();
@@ -113,7 +113,7 @@ function Dashboard() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/registrations/${registrationId}`,
+        `${API_URL}/api/registrations/${registrationId}`,
         {
           method: "DELETE",
         }
@@ -220,9 +220,7 @@ function Dashboard() {
   return (
     <div className="container py-5">
 
-      {/* ==================================================
-          HEADER
-      ================================================== */}
+      {/* HEADER */}
 
       <div className="d-flex justify-content-between align-items-center mb-5">
 
@@ -247,10 +245,7 @@ function Dashboard() {
 
       </div>
 
-
-      {/* ==================================================
-          STUDENT INFORMATION
-      ================================================== */}
+      {/* STUDENT INFORMATION */}
 
       <div className="card shadow-sm border-0 mb-5">
 
@@ -309,10 +304,7 @@ function Dashboard() {
 
       </div>
 
-
-      {/* ==================================================
-          NOTICES
-      ================================================== */}
+      {/* NOTICES */}
 
       <div className="mb-4">
 
@@ -325,9 +317,6 @@ function Dashboard() {
         </p>
 
       </div>
-
-
-      {/* NOTICE LOADING */}
 
       {noticeLoading && (
 
@@ -346,22 +335,14 @@ function Dashboard() {
 
       )}
 
-
-      {/* NO NOTICES */}
-
       {!noticeLoading &&
         notices.length === 0 && (
 
           <div className="alert alert-info mb-5">
-
             No notices available right now.
-
           </div>
 
         )}
-
-
-      {/* NOTICE LIST */}
 
       {!noticeLoading &&
         notices.length > 0 && (
@@ -413,10 +394,7 @@ function Dashboard() {
 
         )}
 
-
-      {/* ==================================================
-          REGISTERED EVENTS
-      ================================================== */}
+      {/* REGISTERED EVENTS */}
 
       <div className="mb-4">
 
@@ -429,9 +407,6 @@ function Dashboard() {
         </p>
 
       </div>
-
-
-      {/* NO REGISTERED EVENTS */}
 
       {registeredEvents.length === 0 ? (
 
@@ -490,8 +465,6 @@ function Dashboard() {
 
                     <div className="card-body p-4">
 
-                      {/* STATUS */}
-
                       {isCancelled ? (
 
                         <span className="badge bg-danger mb-3">
@@ -506,16 +479,10 @@ function Dashboard() {
 
                       )}
 
-
-                      {/* EVENT NAME */}
-
                       <h4 className="fw-bold">
                         {event?.title ||
                           "Event"}
                       </h4>
-
-
-                      {/* DATE */}
 
                       <p>
                         <strong>
@@ -526,9 +493,6 @@ function Dashboard() {
                           "Not available"}
                       </p>
 
-
-                      {/* VENUE */}
-
                       <p>
                         <strong>
                           📍 Venue:
@@ -537,9 +501,6 @@ function Dashboard() {
                         {event?.venue ||
                           "Not available"}
                       </p>
-
-
-                      {/* REGISTRATION ID */}
 
                       <div className="alert alert-light border">
 
@@ -550,15 +511,10 @@ function Dashboard() {
                         <br />
 
                         <span className="text-primary fw-bold">
-
                           {registration._id}
-
                         </span>
 
                       </div>
-
-
-                      {/* STUDENT DETAILS */}
 
                       <div className="border rounded p-3 mb-3">
 
@@ -638,9 +594,6 @@ function Dashboard() {
 
                       </div>
 
-
-                      {/* DESCRIPTION */}
-
                       {event?.description && (
 
                         <p className="text-muted">
@@ -648,9 +601,6 @@ function Dashboard() {
                         </p>
 
                       )}
-
-
-                      {/* BUTTONS */}
 
                       {!isCancelled && (
 
@@ -701,3 +651,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+

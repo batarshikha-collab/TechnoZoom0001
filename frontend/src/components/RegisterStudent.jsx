@@ -1,37 +1,133 @@
-import React, { useEffect, useState } from "react";
 
-function RegisteredStudents() {
-  const [registrations, setRegistrations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [selectedRegistration, setSelectedRegistration] =
-    useState(null);
+import React, { useState } from "react";
+
+function RegisterStudent({ event, onSuccess }) {
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  const [formData, setFormData] = useState({
+    name: "",
+    registrationNo: "",
+    rollNo: "",
+    course: "",
+    branch: "",
+    year: "",
+    semester: "",
+    mobile: "",
+    college: "",
+    email: "",
+  });
+
+  const [loading, setLoading] = useState(false);
 
   // ======================================================
-  // FETCH REGISTRATIONS
+  // HANDLE INPUT
   // ======================================================
 
-  const fetchRegistrations = async () => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // ======================================================
+  // SUBMIT REGISTRATION
+  // ======================================================
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!API_URL) {
+      alert(
+        "API URL is not configured. Please check your frontend .env file."
+      );
+      return;
+    }
+
+    if (!event?._id) {
+      alert("Event information is missing.");
+      return;
+    }
+
     try {
       setLoading(true);
 
+      const loggedInStudent = JSON.parse(
+        localStorage.getItem("student") || "null"
+      );
+
+      const studentId =
+        loggedInStudent?._id ||
+        loggedInStudent?.id ||
+        null;
+
+      if (!studentId) {
+        alert("Please login before registering for an event.");
+        return;
+      }
+
+      const registrationData = {
+        studentId,
+        eventId: event._id,
+
+        name: formData.name.trim(),
+        registrationNo: formData.registrationNo.trim(),
+        rollNo: formData.rollNo.trim(),
+        course: formData.course.trim(),
+        branch: formData.branch.trim(),
+        year: formData.year.trim(),
+        semester: formData.semester.trim(),
+        mobile: formData.mobile.trim(),
+        college: formData.college.trim(),
+        email: formData.email.trim(),
+      };
+
       const response = await fetch(
-        "http://localhost:5000/api/registrations"
+        `${API_URL}/api/registrations`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(registrationData),
+        }
       );
 
       const data = await response.json();
 
       if (!response.ok || !data.success) {
         alert(
-          data.message || "Unable to fetch registrations"
+          data.message ||
+            "Unable to register for the event."
         );
         return;
       }
 
-      setRegistrations(data.registrations || []);
+      alert(
+        "Registration successful! You are registered for this event."
+      );
+
+      setFormData({
+        name: "",
+        registrationNo: "",
+        rollNo: "",
+        course: "",
+        branch: "",
+        year: "",
+        semester: "",
+        mobile: "",
+        college: "",
+        email: "",
+      });
+
+      if (onSuccess) {
+        onSuccess(data.registration);
+      }
     } catch (error) {
       console.error(
-        "Fetch registrations error:",
+        "Registration error:",
         error
       );
 
@@ -43,934 +139,388 @@ function RegisteredStudents() {
     }
   };
 
-  useEffect(() => {
-    fetchRegistrations();
-  }, []);
-
-  // ======================================================
-  // SEARCH
-  // ======================================================
-
-  const filteredRegistrations =
-    registrations.filter((registration) => {
-      const studentName =
-        registration.name ||
-        registration.studentId?.name ||
-        "";
-
-      const email =
-        registration.email ||
-        registration.studentId?.email ||
-        "";
-
-      const registrationNo =
-        registration.registrationNo ||
-        registration.studentId?.registrationNo ||
-        "";
-
-      const rollNo =
-        registration.rollNo || "";
-
-      const eventName =
-        registration.eventId?.title || "";
-
-      const searchText =
-        search.toLowerCase();
-
-      return (
-        studentName
-          .toLowerCase()
-          .includes(searchText) ||
-        email
-          .toLowerCase()
-          .includes(searchText) ||
-        registrationNo
-          .toLowerCase()
-          .includes(searchText) ||
-        rollNo
-          .toLowerCase()
-          .includes(searchText) ||
-        eventName
-          .toLowerCase()
-          .includes(searchText)
-      );
-    });
-
-  // ======================================================
-  // FORMAT DATE
-  // ======================================================
-
-  const formatDate = (date) => {
-    if (!date) {
-      return "N/A";
-    }
-
-    return new Date(date).toLocaleDateString(
-      "en-IN",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }
-    );
-  };
-
-  // ======================================================
-  // GET PROFILE PHOTO
-  // ======================================================
-
-  const getStudentPhoto = (registration) => {
-    return (
-      registration.studentId?.photo ||
-      registration.studentId?.profilePhoto ||
-      ""
-    );
-  };
-
-  // ======================================================
-  // LOADING
-  // ======================================================
-
-  if (loading) {
-    return (
-      <div className="container py-5 text-center">
-
-        <div
-          className="spinner-border text-primary"
-          role="status"
-        ></div>
-
-        <p className="mt-3 text-muted">
-          Loading registrations...
-        </p>
-
-      </div>
-    );
-  }
-
   // ======================================================
   // PAGE
   // ======================================================
 
   return (
-    <div className="bg-light min-vh-100">
+    <div className="container py-4">
 
-      <div className="container-fluid py-5">
+      <div className="card border-0 shadow-sm">
 
-        {/* ==================================================
-            HEADER
-        ================================================== */}
+        <div className="card-body p-4">
 
-        <div className="container">
+          <h3 className="fw-bold mb-1">
+            Event Registration
+          </h3>
 
-          <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+          <p className="text-muted mb-4">
+            {event?.title
+              ? `Register for ${event.title}`
+              : "Fill in your details to register"}
+          </p>
 
-            <div>
-              <h2 className="fw-bold mb-1">
-                Event Registrations
-              </h2>
-
-              <p className="text-muted mb-0">
-                Students registered for TechnoZoom events
-              </p>
-            </div>
-
-            <button
-              className="btn btn-outline-primary mt-3 mt-md-0"
-              onClick={fetchRegistrations}
-            >
-              🔄 Refresh
-            </button>
-
-          </div>
-
-          {/* ==================================================
-              SEARCH + COUNT
-          ================================================== */}
-
-          <div className="card border-0 shadow-sm mb-4">
-
-            <div className="card-body">
-
-              <div className="row align-items-center">
-
-                <div className="col-md-8">
-
-                  <label className="form-label fw-semibold">
-                    Search Student
-                  </label>
-
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Search by name, email, registration no, roll no or event..."
-                    value={search}
-                    onChange={(e) =>
-                      setSearch(e.target.value)
-                    }
-                  />
-
-                </div>
-
-                <div className="col-md-4 mt-3 mt-md-0">
-
-                  <div className="text-md-end">
-
-                    <span className="text-muted">
-                      Total Registrations
-                    </span>
-
-                    <h3 className="fw-bold text-primary mb-0">
-                      {registrations.length}
-                    </h3>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* ==================================================
-            NO DATA
-        ================================================== */}
-
-        {registrations.length === 0 ? (
-
-          <div className="container">
-
-            <div className="alert alert-info text-center">
-              No students have registered for any event yet.
-            </div>
-
-          </div>
-
-        ) : (
-
-          <div className="container-fluid">
+          <form onSubmit={handleSubmit}>
 
             {/* ==================================================
-                TABLE
+                PERSONAL INFORMATION
             ================================================== */}
 
-            <div className="card border-0 shadow-sm">
-
-              <div className="table-responsive">
-
-                <table className="table table-hover align-middle mb-0">
-
-                  <thead className="table-dark">
-
-                    <tr>
-
-                      <th className="px-3">
-                        #
-                      </th>
-
-                      <th>
-                        Student
-                      </th>
-
-                      <th>
-                        Registration No.
-                      </th>
-
-                      <th>
-                        Roll No.
-                      </th>
-
-                      <th>
-                        Course
-                      </th>
-
-                      <th>
-                        Branch
-                      </th>
-
-                      <th>
-                        Year
-                      </th>
-
-                      <th>
-                        Semester
-                      </th>
-
-                      <th>
-                        Event
-                      </th>
-
-                      <th>
-                        Status
-                      </th>
-
-                      <th>
-                        Details
-                      </th>
-
-                    </tr>
-
-                  </thead>
-
-                  <tbody>
-
-                    {filteredRegistrations.length === 0 ? (
-
-                      <tr>
-
-                        <td
-                          colSpan="11"
-                          className="text-center py-5 text-muted"
-                        >
-                          No registration found for "{search}"
-                        </td>
-
-                      </tr>
-
-                    ) : (
-
-                      filteredRegistrations.map(
-                        (registration, index) => {
-
-                          const studentName =
-                            registration.name ||
-                            registration.studentId?.name ||
-                            "N/A";
-
-                          const registrationNo =
-                            registration.registrationNo ||
-                            registration.studentId?.registrationNo ||
-                            "N/A";
-
-                          const rollNo =
-                            registration.rollNo ||
-                            "N/A";
-
-                          const course =
-                            registration.course ||
-                            "N/A";
-
-                          const branch =
-                            registration.branch ||
-                            "N/A";
-
-                          const year =
-                            registration.year ||
-                            "N/A";
-
-                          const semester =
-                            registration.semester ||
-                            "N/A";
-
-                          const eventName =
-                            registration.eventId?.title ||
-                            "Event unavailable";
-
-                          const photo =
-                            getStudentPhoto(
-                              registration
-                            );
-
-                          return (
-
-                            <tr
-                              key={
-                                registration._id
-                              }
-                            >
-
-                              <td className="px-3">
-                                {index + 1}
-                              </td>
-
-                              {/* STUDENT */}
-
-                              <td>
-
-                                <div className="d-flex align-items-center gap-2">
-
-                                  {photo ? (
-
-                                    <img
-                                      src={photo}
-                                      alt={studentName}
-                                      style={{
-                                        width: "45px",
-                                        height: "45px",
-                                        objectFit: "cover",
-                                        borderRadius: "50%",
-                                      }}
-                                    />
-
-                                  ) : (
-
-                                    <div
-                                      className="bg-secondary text-white d-flex align-items-center justify-content-center"
-                                      style={{
-                                        width: "45px",
-                                        height: "45px",
-                                        borderRadius: "50%",
-                                        fontSize: "20px",
-                                      }}
-                                    >
-                                      👤
-                                    </div>
-
-                                  )}
-
-                                  <div>
-
-                                    <div className="fw-bold">
-                                      {studentName}
-                                    </div>
-
-                                    <small className="text-muted">
-                                      {registration.email ||
-                                        registration.studentId?.email ||
-                                        "N/A"}
-                                    </small>
-
-                                  </div>
-
-                                </div>
-
-                              </td>
-
-                              <td>
-
-                                <span className="badge bg-primary">
-                                  {registrationNo}
-                                </span>
-
-                              </td>
-
-                              <td>
-                                {rollNo}
-                              </td>
-
-                              <td>
-                                {course}
-                              </td>
-
-                              <td>
-                                {branch}
-                              </td>
-
-                              <td>
-                                {year}
-                              </td>
-
-                              <td>
-                                {semester}
-                              </td>
-
-                              <td>
-
-                                <span className="fw-semibold">
-                                  {eventName}
-                                </span>
-
-                              </td>
-
-                              <td>
-
-                                {registration.status ===
-                                "Cancelled" ? (
-
-                                  <span className="badge bg-danger">
-                                    Cancelled
-                                  </span>
-
-                                ) : (
-
-                                  <span className="badge bg-success">
-                                    Registered
-                                  </span>
-
-                                )}
-
-                              </td>
-
-                              <td>
-
-                                <button
-                                  className="btn btn-sm btn-primary"
-                                  onClick={() =>
-                                    setSelectedRegistration(
-                                      registration
-                                    )
-                                  }
-                                >
-                                  View Full Details
-                                </button>
-
-                              </td>
-
-                            </tr>
-
-                          );
-                        }
-                      )
-
-                    )}
-
-                  </tbody>
-
-                </table>
+            <h5 className="fw-bold mb-3">
+              Personal Information
+            </h5>
+
+            <div className="row">
+
+              {/* NAME */}
+
+              <div className="col-md-6 mb-3">
+
+                <label className="form-label fw-semibold">
+                  Full Name *
+                </label>
+
+                <input
+                  type="text"
+                  name="name"
+                  className="form-control"
+                  placeholder="Enter full name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+
+              </div>
+
+              {/* EMAIL */}
+
+              <div className="col-md-6 mb-3">
+
+                <label className="form-label fw-semibold">
+                  Email *
+                </label>
+
+                <input
+                  type="email"
+                  name="email"
+                  className="form-control"
+                  placeholder="Enter email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+
+              </div>
+
+              {/* MOBILE */}
+
+              <div className="col-md-6 mb-3">
+
+                <label className="form-label fw-semibold">
+                  Mobile Number *
+                </label>
+
+                <input
+                  type="tel"
+                  name="mobile"
+                  className="form-control"
+                  placeholder="Enter mobile number"
+                  value={formData.mobile}
+                  onChange={handleChange}
+                  maxLength="10"
+                  required
+                />
+
+              </div>
+
+              {/* COLLEGE */}
+
+              <div className="col-md-6 mb-3">
+
+                <label className="form-label fw-semibold">
+                  College *
+                </label>
+
+                <input
+                  type="text"
+                  name="college"
+                  className="form-control"
+                  placeholder="Enter college name"
+                  value={formData.college}
+                  onChange={handleChange}
+                  required
+                />
 
               </div>
 
             </div>
 
-          </div>
+            <hr className="my-4" />
 
-        )}
+            {/* ==================================================
+                ACADEMIC INFORMATION
+            ================================================== */}
 
-      </div>
+            <h5 className="fw-bold mb-3">
+              Academic Information
+            </h5>
 
-      {/* ======================================================
-          DETAILS MODAL
-      ====================================================== */}
+            <div className="row">
 
-      {selectedRegistration && (
+              {/* REGISTRATION NUMBER */}
 
-        <div
-          className="modal fade show d-block"
-          tabIndex="-1"
-          style={{
-            backgroundColor:
-              "rgba(0,0,0,0.6)",
-          }}
-        >
+              <div className="col-md-6 mb-3">
 
-          <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <label className="form-label fw-semibold">
+                  Registration No. *
+                </label>
 
-            <div className="modal-content">
-
-              {/* ==================================================
-                  MODAL HEADER
-              ================================================== */}
-
-              <div className="modal-header">
-
-                <div>
-
-                  <h4 className="modal-title fw-bold">
-                    Student Details
-                  </h4>
-
-                  <small className="text-muted">
-                    Complete event registration information
-                  </small>
-
-                </div>
-
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() =>
-                    setSelectedRegistration(null)
-                  }
-                ></button>
+                <input
+                  type="text"
+                  name="registrationNo"
+                  className="form-control"
+                  placeholder="Enter registration number"
+                  value={formData.registrationNo}
+                  onChange={handleChange}
+                  required
+                />
 
               </div>
 
-              {/* ==================================================
-                  MODAL BODY
-              ================================================== */}
-
-              <div className="modal-body">
-
-                {/* ==================================================
-                    PROFILE SECTION
-                ================================================== */}
-
-                <div className="text-center mb-4">
-
-                  {getStudentPhoto(
-                    selectedRegistration
-                  ) ? (
-
-                    <img
-                      src={getStudentPhoto(
-                        selectedRegistration
-                      )}
-                      alt={
-                        selectedRegistration.name ||
-                        "Student"
-                      }
-                      style={{
-                        width: "120px",
-                        height: "120px",
-                        objectFit: "cover",
-                        borderRadius: "50%",
-                        border: "4px solid #dee2e6",
-                      }}
-                    />
-
-                  ) : (
-
-                    <div
-                      className="mx-auto bg-secondary text-white d-flex align-items-center justify-content-center"
-                      style={{
-                        width: "120px",
-                        height: "120px",
-                        borderRadius: "50%",
-                        fontSize: "50px",
-                      }}
-                    >
-                      👤
-                    </div>
-
-                  )}
-
-                  <h4 className="fw-bold mt-3 mb-1">
-
-                    {selectedRegistration.name ||
-                      selectedRegistration.studentId?.name ||
-                      "N/A"}
-
-                  </h4>
-
-                  <p className="text-muted mb-2">
-
-                    {selectedRegistration.email ||
-                      selectedRegistration.studentId?.email ||
-                      "N/A"}
-
-                  </p>
-
-                  <span className="badge bg-primary">
-                    {selectedRegistration.registrationNo ||
-                      selectedRegistration.studentId?.registrationNo ||
-                      "N/A"}
-                  </span>
-
-                </div>
-
-                {/* ==================================================
-                    BIO
-                ================================================== */}
-
-                <div className="card bg-light border-0 mb-4">
-
-                  <div className="card-body">
-
-                    <h5 className="fw-bold mb-2">
-                      About Student
-                    </h5>
-
-                    <p className="text-muted mb-0">
-
-                      {selectedRegistration.studentId?.bio
-                        ? selectedRegistration.studentId.bio
-                        : "No bio added by the student."}
-
-                    </p>
-
-                  </div>
-
-                </div>
-
-                {/* ==================================================
-                    STUDENT INFORMATION
-                ================================================== */}
-
-                <h5 className="fw-bold mb-3">
-                  Student Information
-                </h5>
-
-                <div className="table-responsive mb-4">
-
-                  <table className="table table-bordered">
-
-                    <tbody>
-
-                      <tr>
-
-                        <th style={{ width: "35%" }}>
-                          Full Name
-                        </th>
-
-                        <td>
-                          {selectedRegistration.name ||
-                            selectedRegistration.studentId?.name ||
-                            "N/A"}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          Registration No.
-                        </th>
-
-                        <td>
-                          {selectedRegistration.registrationNo ||
-                            selectedRegistration.studentId?.registrationNo ||
-                            "N/A"}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          Roll No.
-                        </th>
-
-                        <td>
-                          {selectedRegistration.rollNo ||
-                            "N/A"}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          Course
-                        </th>
-
-                        <td>
-                          {selectedRegistration.course ||
-                            "N/A"}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          Branch
-                        </th>
-
-                        <td>
-                          {selectedRegistration.branch ||
-                            "N/A"}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          Year
-                        </th>
-
-                        <td>
-                          {selectedRegistration.year ||
-                            "N/A"}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          Semester
-                        </th>
-
-                        <td>
-                          {selectedRegistration.semester ||
-                            "N/A"}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          Mobile
-                        </th>
-
-                        <td>
-                          {selectedRegistration.mobile ||
-                            "N/A"}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          College
-                        </th>
-
-                        <td>
-                          {selectedRegistration.college ||
-                            "N/A"}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          Email
-                        </th>
-
-                        <td>
-                          {selectedRegistration.email ||
-                            selectedRegistration.studentId?.email ||
-                            "N/A"}
-                        </td>
-
-                      </tr>
-
-                    </tbody>
-
-                  </table>
-
-                </div>
-
-                {/* ==================================================
-                    EVENT INFORMATION
-                ================================================== */}
-
-                <h5 className="fw-bold mb-3">
-                  Event Information
-                </h5>
-
-                <div className="table-responsive">
-
-                  <table className="table table-bordered">
-
-                    <tbody>
-
-                      <tr>
-
-                        <th style={{ width: "35%" }}>
-                          Event Name
-                        </th>
-
-                        <td>
-                          {selectedRegistration.eventId?.title ||
-                            "Event unavailable"}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          Category
-                        </th>
-
-                        <td>
-                          {selectedRegistration.eventId?.category ||
-                            "N/A"}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          Event Date
-                        </th>
-
-                        <td>
-                          {selectedRegistration.eventId?.date ||
-                            "N/A"}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          Venue
-                        </th>
-
-                        <td>
-                          {selectedRegistration.eventId?.venue ||
-                            "N/A"}
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          Registration Status
-                        </th>
-
-                        <td>
-
-                          {selectedRegistration.status ===
-                          "Cancelled" ? (
-
-                            <span className="badge bg-danger">
-                              Cancelled
-                            </span>
-
-                          ) : (
-
-                            <span className="badge bg-success">
-                              Registered
-                            </span>
-
-                          )}
-
-                        </td>
-
-                      </tr>
-
-                      <tr>
-
-                        <th>
-                          Registered On
-                        </th>
-
-                        <td>
-                          {formatDate(
-                            selectedRegistration.createdAt
-                          )}
-                        </td>
-
-                      </tr>
-
-                    </tbody>
-
-                  </table>
-
-                </div>
+              {/* ROLL NUMBER */}
+
+              <div className="col-md-6 mb-3">
+
+                <label className="form-label fw-semibold">
+                  Roll No. *
+                </label>
+
+                <input
+                  type="text"
+                  name="rollNo"
+                  className="form-control"
+                  placeholder="Enter roll number"
+                  value={formData.rollNo}
+                  onChange={handleChange}
+                  required
+                />
 
               </div>
 
-              {/* ==================================================
-                  MODAL FOOTER
-              ================================================== */}
+              {/* COURSE */}
 
-              <div className="modal-footer">
+              <div className="col-md-6 mb-3">
 
-                <button
-                  className="btn btn-secondary"
-                  onClick={() =>
-                    setSelectedRegistration(null)
-                  }
+                <label className="form-label fw-semibold">
+                  Course *
+                </label>
+
+                <input
+                  type="text"
+                  name="course"
+                  className="form-control"
+                  placeholder="Example: B.Tech"
+                  value={formData.course}
+                  onChange={handleChange}
+                  required
+                />
+
+              </div>
+
+              {/* BRANCH */}
+
+              <div className="col-md-6 mb-3">
+
+                <label className="form-label fw-semibold">
+                  Branch *
+                </label>
+
+                <input
+                  type="text"
+                  name="branch"
+                  className="form-control"
+                  placeholder="Example: CSE"
+                  value={formData.branch}
+                  onChange={handleChange}
+                  required
+                />
+
+              </div>
+
+              {/* YEAR */}
+
+              <div className="col-md-6 mb-3">
+
+                <label className="form-label fw-semibold">
+                  Year *
+                </label>
+
+                <select
+                  name="year"
+                  className="form-select"
+                  value={formData.year}
+                  onChange={handleChange}
+                  required
                 >
-                  Close
-                </button>
+
+                  <option value="">
+                    Select Year
+                  </option>
+
+                  <option value="1st Year">
+                    1st Year
+                  </option>
+
+                  <option value="2nd Year">
+                    2nd Year
+                  </option>
+
+                  <option value="3rd Year">
+                    3rd Year
+                  </option>
+
+                  <option value="4th Year">
+                    4th Year
+                  </option>
+
+                </select>
+
+              </div>
+
+              {/* SEMESTER */}
+
+              <div className="col-md-6 mb-3">
+
+                <label className="form-label fw-semibold">
+                  Semester *
+                </label>
+
+                <select
+                  name="semester"
+                  className="form-select"
+                  value={formData.semester}
+                  onChange={handleChange}
+                  required
+                >
+
+                  <option value="">
+                    Select Semester
+                  </option>
+
+                  <option value="1st Semester">
+                    1st Semester
+                  </option>
+
+                  <option value="2nd Semester">
+                    2nd Semester
+                  </option>
+
+                  <option value="3rd Semester">
+                    3rd Semester
+                  </option>
+
+                  <option value="4th Semester">
+                    4th Semester
+                  </option>
+
+                  <option value="5th Semester">
+                    5th Semester
+                  </option>
+
+                  <option value="6th Semester">
+                    6th Semester
+                  </option>
+
+                  <option value="7th Semester">
+                    7th Semester
+                  </option>
+
+                  <option value="8th Semester">
+                    8th Semester
+                  </option>
+
+                </select>
 
               </div>
 
             </div>
 
-          </div>
+            {/* ==================================================
+                EVENT INFORMATION
+            ================================================== */}
+
+            {event && (
+
+              <div className="alert alert-primary mt-3">
+
+                <strong>
+                  Event:
+                </strong>{" "}
+                {event.title}
+
+                {event.date && (
+                  <>
+                    <br />
+
+                    <strong>
+                      Date:
+                    </strong>{" "}
+                    {event.date}
+                  </>
+                )}
+
+                {event.venue && (
+                  <>
+                    <br />
+
+                    <strong>
+                      Venue:
+                    </strong>{" "}
+                    {event.venue}
+                  </>
+                )}
+
+              </div>
+
+            )}
+
+            {/* ==================================================
+                SUBMIT
+            ================================================== */}
+
+            <div className="d-flex justify-content-end mt-4">
+
+              <button
+                type="submit"
+                className="btn btn-primary px-4"
+                disabled={loading}
+              >
+
+                {loading ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                    ></span>
+
+                    Registering...
+                  </>
+                ) : (
+                  "Register for Event"
+                )}
+
+              </button>
+
+            </div>
+
+          </form>
 
         </div>
 
-      )}
+      </div>
 
     </div>
   );
 }
 
-export default RegisteredStudents;
+export default RegisterStudent;

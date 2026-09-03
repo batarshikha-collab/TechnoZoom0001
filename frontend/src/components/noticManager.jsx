@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 
 function NoticeManager() {
@@ -21,7 +22,7 @@ function NoticeManager() {
       setLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/notices"
+        `${import.meta.env.VITE_API_URL}/api/notices`
       );
 
       const data = await response.json();
@@ -58,7 +59,7 @@ function NoticeManager() {
       setLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/notices",
+        `${import.meta.env.VITE_API_URL}/api/notices`,
         {
           method: "POST",
 
@@ -81,7 +82,6 @@ function NoticeManager() {
         setTitle("");
         setMessage("");
 
-        // MongoDB se fresh notices load
         fetchNotices();
       } else {
         alert(
@@ -116,7 +116,7 @@ function NoticeManager() {
       setLoading(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/notices/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/notices/${id}`,
         {
           method: "DELETE",
         }
@@ -127,7 +127,6 @@ function NoticeManager() {
       if (data.success) {
         alert("Notice deleted successfully!");
 
-        // MongoDB se fresh notices load
         fetchNotices();
       } else {
         alert(
@@ -171,10 +170,6 @@ function NoticeManager() {
   return (
     <div className="container py-5">
 
-      {/* ==================================================
-          HEADER
-      ================================================== */}
-
       <div className="mb-5">
 
         <h1 className="fw-bold">
@@ -188,10 +183,7 @@ function NoticeManager() {
 
       </div>
 
-
-      {/* ==================================================
-          ADD NOTICE
-      ================================================== */}
+      {/* ADD NOTICE */}
 
       <div className="card shadow-sm border-0 mb-5">
 
@@ -202,8 +194,6 @@ function NoticeManager() {
           </h3>
 
           <form onSubmit={handleAddNotice}>
-
-            {/* TITLE */}
 
             <div className="mb-3">
 
@@ -223,9 +213,6 @@ function NoticeManager() {
 
             </div>
 
-
-            {/* MESSAGE */}
-
             <div className="mb-4">
 
               <label className="form-label fw-semibold">
@@ -244,19 +231,14 @@ function NoticeManager() {
 
             </div>
 
-
-            {/* BUTTON */}
-
             <button
               type="submit"
               className="btn btn-primary"
               disabled={loading}
             >
-
               {loading
                 ? "Please wait..."
                 : "Add Notice"}
-
             </button>
 
           </form>
@@ -265,10 +247,7 @@ function NoticeManager() {
 
       </div>
 
-
-      {/* ==================================================
-          ALL NOTICES
-      ================================================== */}
+      {/* ALL NOTICES */}
 
       <div className="d-flex justify-content-between align-items-center mb-4">
 
@@ -290,9 +269,6 @@ function NoticeManager() {
 
       </div>
 
-
-      {/* LOADING */}
-
       {loading && notices.length === 0 && (
 
         <div className="text-center py-5">
@@ -310,9 +286,6 @@ function NoticeManager() {
 
       )}
 
-
-      {/* NO NOTICES */}
-
       {!loading && notices.length === 0 && (
 
         <div className="alert alert-info">
@@ -322,9 +295,6 @@ function NoticeManager() {
         </div>
 
       )}
-
-
-      {/* NOTICE LIST */}
 
       {notices.length > 0 && (
 
@@ -341,21 +311,13 @@ function NoticeManager() {
 
                 <div className="card-body p-4">
 
-                  {/* TITLE */}
-
                   <h4 className="fw-bold">
                     {notice.title}
                   </h4>
 
-
-                  {/* MESSAGE */}
-
                   <p className="text-muted">
                     {notice.message}
                   </p>
-
-
-                  {/* DATE */}
 
                   <small className="text-secondary">
 
@@ -366,9 +328,6 @@ function NoticeManager() {
                     )}
 
                   </small>
-
-
-                  {/* DELETE */}
 
                   <div className="mt-4">
 
@@ -403,4 +362,3 @@ function NoticeManager() {
 }
 
 export default NoticeManager;
-
